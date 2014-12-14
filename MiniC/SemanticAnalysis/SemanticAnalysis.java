@@ -399,8 +399,11 @@ public class SemanticAnalysis implements Visitor {
         /* Start of your code: */
 		if(x.astType instanceof VoidType)
 			reporter.reportError(errMsg[3], "", x.pos);
-		else if((x.astType instanceof ArrayType) && (((ArrayType)x.astType).astType instanceof VoidType))
+		else if((x.astType instanceof ArrayType) && (((ArrayType)x.astType).astType instanceof VoidType)) {
+			((ArrayType)x.astType).astType.accept(this);
 			reporter.reportError(errMsg[4], "", x.pos);
+		}
+		x.astType.accept(this);
         /* End of your code */
     }
 
