@@ -386,7 +386,7 @@ public class SemanticAnalysis implements Visitor {
         // Error 2 in that case.
 
         /* Start of your code: */
-
+		
         /* End of your code */
 
         // STEP 3:
