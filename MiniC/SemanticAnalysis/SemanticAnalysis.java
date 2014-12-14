@@ -330,7 +330,10 @@ public class SemanticAnalysis implements Visitor {
         // name is already present in this scope.
 
         /* Start of your code: */
-        
+        if(!scopeStack.enter(x.idAST.Lexeme, x)) {
+        	reporter.reportError(errMsg[2], "", x.idAST.pos);
+        }
+        x.idAST.accept(this);
         /* End of your code */
 
         // STEP 3:
@@ -339,7 +342,12 @@ public class SemanticAnalysis implements Visitor {
         // x.tAST is of type int.
 
         /* Start of your code: */
-
+        if(x.idAST.Lexeme.equals("main")) {
+        	if(!(x.tAST instanceof IntType)) {
+        		reporter.reportError(errMsg[1], "", x.tAST.pos);
+        	}
+        	x.tAST.accept(this);;
+        }
         /* End of your code */
 
         // STEP 1:
