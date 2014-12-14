@@ -312,7 +312,8 @@ public class SemanticAnalysis implements Visitor {
         // returned, then the program does not contain a main function.
 
         /* Start of your code: */
-
+    	if(scopeStack.retrieve("main") == null)
+    		reporter.reportError(errMsg[0], "", progAST.pos);
         /* End of your code */
     }
 
