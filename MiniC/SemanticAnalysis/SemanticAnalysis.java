@@ -389,8 +389,7 @@ public class SemanticAnalysis implements Visitor {
         /* Start of your code: */
 		if(!scopeStack.enter(x.astIdent.Lexeme, x))
 			reporter.reportError(errMsg[2], "", x.astIdent.pos);
-	    x.astIdent.accept(this);
-        /* End of your code */
+	    /* End of your code */
 
         // STEP 3:
         // Check that the formal parameter is not of type void or void[]. 
@@ -400,11 +399,9 @@ public class SemanticAnalysis implements Visitor {
 		if(x.astType instanceof VoidType)
 			reporter.reportError(errMsg[3], "", x.pos);
 		else if((x.astType instanceof ArrayType) && (((ArrayType)x.astType).astType instanceof VoidType)) {
-			((ArrayType)x.astType).astType.accept(this);
 			reporter.reportError(errMsg[4], "", x.pos);
 		}
-		x.astType.accept(this);
-        /* End of your code */
+		/* End of your code */
     }
 
     public void visit(FormalParamDeclSequence x) {
@@ -440,6 +437,31 @@ public class SemanticAnalysis implements Visitor {
         // If conditions (1) or (2) are violated, then you should report Error 6.
 
         /* Start of your code: */
+		if(x.rAST.type.AssignableTo(x.lAST.type)) {
+			if(x.lAST.type.Tequal(x.rAST.type)) {
+				//nothing to do
+			} else {
+				if(x.lAST.type.Tequal(StdEnvironment.floatType)) {
+					//x.eAST = i2f(x.eAST);
+					if(x.rAST.type.Tequal(StdEnvironment.intType)) {
+						x.rAST = i2f(x.rAST);
+					}
+				}
+			}
+		} else {
+			reporter.reportError(errMsg[6], "", x.lAST.pos);
+		}
+		
+		
+		
+		//if(x.lAST.type.Tequal(x.rAST.type)) {	
+		//} else {
+		//	if(x.rAST.type.AssignableTo(x.lAST.type)) {
+		//		
+		//	} else {
+		//		reporter.reportError(errMsg[6], "", x.lAST.pos);
+		//	}
+		//}
 
         /* End of your code */
 
