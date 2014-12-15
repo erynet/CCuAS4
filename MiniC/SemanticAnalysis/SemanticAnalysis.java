@@ -216,7 +216,9 @@ public class SemanticAnalysis implements Visitor {
 		return (ActualParam) ((ActualParamSequence) P).lAST;
     }
     
-    private int GetNrIfInitialArray(VarDecl var) {
+    
+    //my custom functions
+    private int GetNrOfInitialArray(VarDecl var) {
     	Expr E = var.eAST;
     	
     	assert((E instanceof ExprSequence) || (E instanceof EmptyExpr));
@@ -230,6 +232,22 @@ public class SemanticAnalysis implements Visitor {
     		assert((E instanceof ExprSequence) || (E instanceof EmptyExpr));
     	}
     	return Nr;
+    }
+    
+    private ExprSequence GetArrayItems (VarDecl v, int nr) {
+    	int fItems = GetNrOfInitialArray(v);
+    	assert(fItems >= 0);
+    	assert(nr <= fItems);
+    	ExprSequence S = (ExprSequence) v.eAST;
+    	
+    	for(int i = 1; i < nr; i++) {
+    		assert(S.rAST instanceof ExprSequence);
+    		S = (ExprSequence) S.rAST;
+    	}
+    	
+    	assert(S.lAST instanceof Expr);
+    	
+    	return (ExprSequence) S;    	
     }
 
     // Given a type t, this function can be used to print the type.
@@ -609,28 +627,52 @@ public class SemanticAnalysis implements Visitor {
 		if (!(x.eAST instanceof EmptyExpr)) {
 	            x.eAST.accept(this);
 	            if (x.tAST instanceof ArrayType) {
-	               //STEP 4:
-	               //
-	               // Array declarations.
-	               // Check for error messages 15, 16, 13.
-	               // Perform i2f coercion if necessary.
+	  	            //STEP 4:
+	            	//
+	            	// Array declarations.
+	            	// Check for error messages 15, 16, 13.
+	            	// Perform i2f coercion if necessary.
 	
-	               /* Start of your code: */
-//HERE
-	               /* End of your code */
+	            	/* Start of your code: */
+	            	if(!(x.eAST instanceof ExprSequence))
+	            		reporter.reportError(errMsg[15], "", x.pos);
+	            	else {
+	                	int ArrayRange, ArrayNr = 0;
+	                	ArrayType at = (ArrayType) x.tAST;
+	                	ArrayRange = at.GetRange();
+	                	ArrayNr = GetNrOfInitialArray(x);
+	                	
+	                	if(ArrayRange < ArrayNr)
+	                		reporter.reportError(errMsg[16], "", x.pos);
+	                	else {
+		            		ExprSequence ArrayItems;
+		            		Type key = at.astType;
+		            		
+		            		for(int i = 1; i <= ArrayNr; i++) {
+		            			ArrayItems = GetArrayItems(x, i);
+		            			if(ArrayItems.lAST.type.AssignableTo(key)) {
+		            				if(ArrayItems.lAST.type.Tequal(StdEnvironment.intType) && key.Tequal(StdEnvironment.floatType))
+		            					ArrayItems.lAST = i2f(ArrayItems.lAST);
+		            				
+		            			} else
+		            				reporter.reportError(errMsg[13], "", ArrayItems.lAST.pos);
+		            		}
+	                	}
+	            	}
+	            	/* End of your code */
 	            } else {
-	               //STEP 4:
-	               //
-	               // Non-array declarations, i.e., scalar variables.
-	               // Check for error messages 14, 6.
-	               // Perform i2f coercion if necessary.
+	            	//STEP 4:
+	            	//
+	            	// Non-array declarations, i.e., scalar variables.
+	            	// Check for error messages 14, 6.
+	            	// Perform i2f coercion if necessary.
 	
-	               /* Start of your code: */
+	            	/* Start of your code: */
 	            	if(x.eAST instanceof ExprSequence)
 	            		reporter.reportError(errMsg[14], "", x.pos);
 	            	else if(!(x.eAST.type.AssignableTo(x.tAST)))
 	            		reporter.reportError(errMsg[6], "", x.pos);
-	               /* End of your code */
+	            	/* End of your code */
 	            }
 		}
         //STEP 1:
