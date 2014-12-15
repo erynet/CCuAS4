@@ -759,74 +759,68 @@ public class SemanticAnalysis implements Visitor {
     }
 
     public void visit(BinaryExpr x) {
-		x.lAST.accept(this);
-		x.oAST.accept(this);
-		x.rAST.accept(this);
-		if(HasIntOrFloatArgs(x.oAST)) {
-		    if(x.lAST.type.Tequal(StdEnvironment.intType) &&
-		       x.rAST.type.Tequal(StdEnvironment.intType)) {
-		    	x.oAST.type = StdEnvironment.intType;
-			if(HasBoolReturnType(x.oAST)) {
-			    x.type = StdEnvironment.boolType;
-			} else {
-			    x.type = StdEnvironment.intType;
-			}
-			return;
-		    } else if(x.lAST.type.Tequal(StdEnvironment.floatType) &&
-			      x.rAST.type.Tequal(StdEnvironment.floatType)) {
-				x.oAST.type = StdEnvironment.floatType;
-				if(HasBoolReturnType(x.oAST)) {
+    	x.lAST.accept(this);
+    	x.oAST.accept(this);
+    	x.rAST.accept(this);
+    	if(HasIntOrFloatArgs(x.oAST)) {
+    		if(x.lAST.type.Tequal(StdEnvironment.intType) && x.rAST.type.Tequal(StdEnvironment.intType)) {
+    			x.oAST.type = StdEnvironment.intType;
+				if(HasBoolReturnType(x.oAST))
 				    x.type = StdEnvironment.boolType;
-				} else {
-				    x.type = StdEnvironment.floatType;
-				}
+				else
+				    x.type = StdEnvironment.intType;
+				
 				return;
-		    } else if (x.lAST.type.Tequal(StdEnvironment.intType) &&
-			       x.rAST.type.Tequal(StdEnvironment.floatType)) {
+		    } else if(x.lAST.type.Tequal(StdEnvironment.floatType) && x.rAST.type.Tequal(StdEnvironment.floatType)) {
+				x.oAST.type = StdEnvironment.floatType;
+				if(HasBoolReturnType(x.oAST))
+				    x.type = StdEnvironment.boolType;
+				else
+				    x.type = StdEnvironment.floatType;
+				
+				return;
+		    } else if (x.lAST.type.Tequal(StdEnvironment.intType) && x.rAST.type.Tequal(StdEnvironment.floatType)) {
 		    	//coercion of left operand to float:
 				x.lAST = i2f(x.lAST);
 				x.oAST.type = StdEnvironment.floatType;
-				if(HasBoolReturnType(x.oAST)) {
+				if(HasBoolReturnType(x.oAST))
 				    x.type = StdEnvironment.boolType;
-				} else {
+				else
 				    x.type = StdEnvironment.floatType;
-				}
+				
 				return;
-		    } else if (x.lAST.type.Tequal(StdEnvironment.floatType) &&
-			       x.rAST.type.Tequal(StdEnvironment.intType)) {
-	                // STEP 2:
-	                // This code is part of the type checking for binary
-	                // expressions. In this case,
-	                // the left-hand operand is float, the right-hand operand is int.
-	                // We have to type-cast the right operand to float.
-	                // This is the dual case to "int x float" above.
-	
-	                /* Start of your code: */
-			    	//x.rAST = i2f(x.rAST);
-		    		x.oAST.type = StdEnvironment.floatType;
-		    		if(HasBoolReturnType(x.oAST)) {
-		    			x.type = StdEnvironment.boolType;
-		    		} else {
-		    			x.type = StdEnvironment.floatType;
-		    		}
-		    		x.rAST = i2f(x.rAST);
-	                /* End of your code */
-			return;
-	    }
-	} else if(HasBoolArgs(x.oAST)) {
-	    if(x.lAST.type.Tequal(StdEnvironment.boolType) &&
-	       x.rAST.type.Tequal(StdEnvironment.boolType)) {
-			x.oAST.type = StdEnvironment.intType; //!!!!!!!!!!!!!!!!!!!!!
-			x.type = StdEnvironment.boolType;
-			return;
-	    }
-	}
-	x.oAST.type = StdEnvironment.errorType;
-	x.type = StdEnvironment.errorType;
-        if (!((x.lAST.type instanceof ErrorType) || (x.rAST.type instanceof ErrorType)))
-        {
+		    } else if (x.lAST.type.Tequal(StdEnvironment.floatType) && x.rAST.type.Tequal(StdEnvironment.intType)) {
+                // STEP 2:
+                // This code is part of the type checking for binary
+                // expressions. In this case,
+                // the left-hand operand is float, the right-hand operand is int.
+                // We have to type-cast the right operand to float.
+                // This is the dual case to "int x float" above.
+
+                /* Start of your code: */
+		    	//x.rAST = i2f(x.rAST);
+	    		x.oAST.type = StdEnvironment.floatType;
+	    		if(HasBoolReturnType(x.oAST)) {
+	    			x.type = StdEnvironment.boolType;
+	    		} else {
+	    			x.type = StdEnvironment.floatType;
+	    		}
+	    		x.rAST = i2f(x.rAST);
+                /* End of your code */
+	    		return;
+		    }
+    	} else if(HasBoolArgs(x.oAST)) {
+    		if(x.lAST.type.Tequal(StdEnvironment.boolType) && x.rAST.type.Tequal(StdEnvironment.boolType)) {
+    			x.oAST.type = StdEnvironment.intType; //!!!!!!!!!!!!!!!!!!!!!
+    			x.type = StdEnvironment.boolType;
+    			return;
+    		}
+    	}
+		x.oAST.type = StdEnvironment.errorType;
+		x.type = StdEnvironment.errorType;
+        if (!((x.lAST.type instanceof ErrorType) || (x.rAST.type instanceof ErrorType))) {
            // Error not spurious, because AST children are ok.
-	   reporter.reportError(errMsg[9], "", x.pos);
+        	reporter.reportError(errMsg[9], "", x.pos);
         }
     }
 
@@ -906,7 +900,10 @@ public class SemanticAnalysis implements Visitor {
         // where f is not a function. 
 
         /* Start of your code: */
-
+		if(!(D instanceof FunDecl)) {
+			reporter.reportError(errMsg[19], "", x.pos);
+			return;
+		}
         /* End of your code */
 		FunDecl F = (FunDecl ) D;
         // STEP 2:
@@ -917,7 +914,14 @@ public class SemanticAnalysis implements Visitor {
         // the number of formal and actual parameters.
 
         /* Start of your code: */
-
+		int FormalParamNr = GetNrOfFormalParams(F);
+		int ActualParamNr = GetNrOfActualParams(x);
+		
+		if(FormalParamNr < ActualParamNr) {
+			reporter.reportError(errMsg[23], "", x.pos);
+		} else if(FormalParamNr > ActualParamNr) {
+			reporter.reportError(errMsg[24], "", x.pos);
+		} else {
         /* End of your code */
 
         // STEP 2:
@@ -950,7 +954,21 @@ public class SemanticAnalysis implements Visitor {
             Type FormalT = Form.astType;
             Type ActualT = Act.pAST.type;
         */
-
+			for(int i = 1; i <= FormalParamNr; i++) {
+				FormalParamDecl FPD = GetFormalParam(F, i);
+				Type FPDaT = FPD.astType;
+				ActualParam AP = GetActualParam(x, i);
+				Type APT = AP.pAST.type;
+				
+				if(APT.AssignableTo(FPDaT)) {
+					if(APT.Tequal(StdEnvironment.intType) && FPDaT.Tequal(StdEnvironment.floatType))
+						AP.pAST = i2f(AP.pAST);
+				} else {
+					reporter.reportError(errMsg[25] + ", parameter " + i + ",", "", x.pos);
+					break;
+				}
+			}
+		}
 
 
         //}
