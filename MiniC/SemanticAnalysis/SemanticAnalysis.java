@@ -234,13 +234,15 @@ public class SemanticAnalysis implements Visitor {
     	return Nr;
     }
     
-    private ExprSequence GetArrayItems (VarDecl v, int nr) {
-    	int fItems = GetNrOfInitialArray(v);
-    	assert(fItems >= 0);
-    	assert(nr <= fItems);
+    private ExprSequence GetArrayItems (VarDecl v, int index) {
+    	int ArrayNr = GetNrOfInitialArray(v);
+    	
+    	assert((index <= ArrayNr) && (ArrayNr >= 0));
+    	//assert(fItems >= 0);
+    	//assert(nr <= fItems);
     	ExprSequence S = (ExprSequence) v.eAST;
     	
-    	for(int i = 1; i < nr; i++) {
+    	for(int i = 1; i < index; i++) {
     		assert(S.rAST instanceof ExprSequence);
     		S = (ExprSequence) S.rAST;
     	}
