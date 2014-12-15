@@ -630,7 +630,23 @@ public class SemanticAnalysis implements Visitor {
 		            		Type key = at.astType;
 		            		ExprSequence ArrayItems;
 		            		for(int i = 1; i <= ArrayNr; i++) {
-		            			ArrayItems = GetArrayItems(x, i);
+		            			//ArrayItems = GetArrayItems(x, i);
+		            			
+		            			//experimental
+		            			
+		            			ExprSequence S = (ExprSequence) x.eAST;
+		            			assert((i <= ArrayNr) && (ArrayNr >= 0));
+		            			
+		            			for(int j = 1; j < i; j++) {
+		            	    		assert(S.rAST instanceof ExprSequence);
+		            	    		S = (ExprSequence) S.rAST;
+		            	    	}
+		            	    	assert(S.lAST instanceof Expr);
+		            	    	
+		            	    	ArrayItems = (ExprSequence) S;
+		            	    	
+		            	    	//experimental
+		            			
 		            			if(ArrayItems.lAST.type.AssignableTo(key)) {
 		            				if(ArrayItems.lAST.type.Tequal(StdEnvironment.intType) && key.Tequal(StdEnvironment.floatType))
 		            					ArrayItems.lAST = i2f(ArrayItems.lAST);
