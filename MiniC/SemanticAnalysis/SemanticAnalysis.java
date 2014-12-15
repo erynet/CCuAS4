@@ -974,7 +974,6 @@ public class SemanticAnalysis implements Visitor {
 					if(APT.Tequal(StdEnvironment.intType) && FPDaT.Tequal(StdEnvironment.floatType))
 						AP.pAST = i2f(AP.pAST);
 				} else {
-					//reporter.reportError(errMsg[25] + ", parameter " + i + ",", "", x.pos);
 					reporter.reportError(errMsg[25], "", x.pos);
 					break;
 				}
