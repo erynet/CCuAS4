@@ -233,21 +233,6 @@ public class SemanticAnalysis implements Visitor {
     	}
     	return Nr;
     }
-    
-    private ExprSequence GetArrayItems (VarDecl v, int index) {
-    	ExprSequence S = (ExprSequence) v.eAST;
-    	
-    	int ArrayNr = GetNrOfInitialArray(v);
-    	assert((index <= ArrayNr) && (ArrayNr >= 0));
-    	
-    	for(int i = 1; i < index; i++) {
-    		assert(S.rAST instanceof ExprSequence);
-    		S = (ExprSequence) S.rAST;
-    	}
-    	assert(S.lAST instanceof Expr);
-    	
-    	return (ExprSequence) S;    	
-    }
 
     // Given a type t, this function can be used to print the type.
     // Useful for debuggging, a similar mechanism is used in the
@@ -630,10 +615,6 @@ public class SemanticAnalysis implements Visitor {
 		            		Type key = at.astType;
 		            		ExprSequence ArrayItems;
 		            		for(int i = 1; i <= ArrayNr; i++) {
-		            			//ArrayItems = GetArrayItems(x, i);
-		            			
-		            			//experimental
-		            			
 		            			ExprSequence S = (ExprSequence) x.eAST;
 		            			assert((i <= ArrayNr) && (ArrayNr >= 0));
 		            			
@@ -641,12 +622,9 @@ public class SemanticAnalysis implements Visitor {
 		            	    		assert(S.rAST instanceof ExprSequence);
 		            	    		S = (ExprSequence) S.rAST;
 		            	    	}
-		            	    	assert(S.lAST instanceof Expr);
-		            	    	
+		            	    	assert(S.lAST instanceof Expr);		            	    	
 		            	    	ArrayItems = (ExprSequence) S;
 		            	    	
-		            	    	//experimental
-		            			
 		            			if(ArrayItems.lAST.type.AssignableTo(key)) {
 		            				if(ArrayItems.lAST.type.Tequal(StdEnvironment.intType) && key.Tequal(StdEnvironment.floatType))
 		            					ArrayItems.lAST = i2f(ArrayItems.lAST);
