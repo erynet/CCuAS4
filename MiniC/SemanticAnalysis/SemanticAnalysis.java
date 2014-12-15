@@ -215,6 +215,22 @@ public class SemanticAnalysis implements Visitor {
 		assert (((ActualParamSequence) P).lAST instanceof ActualParam);
 		return (ActualParam) ((ActualParamSequence) P).lAST;
     }
+    
+    private int GetNrIfInitialArray(VarDecl var) {
+    	Expr E = var.eAST;
+    	
+    	assert((E instanceof EmptySequence) || (E instanceof EmptyExpr));
+    	if(E instanceof EmptyExpr)
+    		return 0;
+    	
+    	int Nr = 0;
+    	while(E instanceof ExprSequence) {
+    		E = ((ExprSequence) E).rAST;
+    		Nr++;
+    		assert((E instanceof EmptySequence) || (E instanceof EmptyExpr));
+    	}
+    	return Nr;
+    }
 
     // Given a type t, this function can be used to print the type.
     // Useful for debuggging, a similar mechanism is used in the
@@ -334,7 +350,6 @@ public class SemanticAnalysis implements Visitor {
         if(!scopeStack.enter(x.idAST.Lexeme, x)) {
         	reporter.reportError(errMsg[2], "", x.idAST.pos);
         }
-        x.idAST.accept(this);
         /* End of your code */
 
         // STEP 3:
@@ -344,10 +359,9 @@ public class SemanticAnalysis implements Visitor {
 
         /* Start of your code: */
         if(x.idAST.Lexeme.equals("main")) {
-        	if(!(x.tAST instanceof IntType)) {
-        		reporter.reportError(errMsg[1], "", x.tAST.pos);
+        	if(!(x.tAST.Tequal(StdEnvironment.intType))) {
+        		reporter.reportError(errMsg[1], "", x.idAST.pos);
         	}
-        	x.tAST.accept(this);;
         }
         /* End of your code */
 
@@ -396,10 +410,16 @@ public class SemanticAnalysis implements Visitor {
         // Report error messages 3 and 4 respectively:
 
         /* Start of your code: */
-		if(x.astType instanceof VoidType)
-			reporter.reportError(errMsg[3], "", x.pos);
-		else if((x.astType instanceof ArrayType) && (((ArrayType)x.astType).astType instanceof VoidType)) {
-			reporter.reportError(errMsg[4], "", x.pos);
+		//if(x.astType.Tequal(StdEnvironment.voidType))
+		//	reporter.reportError(errMsg[3], "", x.pos);
+		//else if((x.astType instanceof ArrayType) && (((ArrayType)x.astType).astType instanceof VoidType)) {
+		//	reporter.reportError(errMsg[4], "", x.pos);
+		//}
+		if(x.astType.Tequal(StdEnvironment.voidType)) {
+			if(x.astType instanceof ArrayType)
+				reporter.reportError(errMsg[4], "", x.astType.pos);
+			else
+				reporter.reportError(errMsg[3], "", x.astType.pos);
 		}
 		/* End of your code */
     }
@@ -442,27 +462,18 @@ public class SemanticAnalysis implements Visitor {
 				//nothing to do
 			} else {
 				if(x.lAST.type.Tequal(StdEnvironment.floatType)) {
-					//x.eAST = i2f(x.eAST);
 					if(x.rAST.type.Tequal(StdEnvironment.intType)) {
 						x.rAST = i2f(x.rAST);
+					}
+				} else if(x.rAST.type.Tequal(StdEnvironment.floatType)) {
+					if(x.lAST.type.Tequal(StdEnvironment.intType)) {
+						x.lAST = i2f(x.lAST);
 					}
 				}
 			}
 		} else {
 			reporter.reportError(errMsg[6], "", x.lAST.pos);
 		}
-		
-		
-		
-		//if(x.lAST.type.Tequal(x.rAST.type)) {	
-		//} else {
-		//	if(x.rAST.type.AssignableTo(x.lAST.type)) {
-		//		
-		//	} else {
-		//		reporter.reportError(errMsg[6], "", x.lAST.pos);
-		//	}
-		//}
-
         /* End of your code */
 
 		if(!(x.lAST instanceof VarExpr) && !(x.lAST instanceof ArrayExpr)) {
