@@ -854,7 +854,24 @@ public class SemanticAnalysis implements Visitor {
         // slightly more complicated case.
 
         /* Start of your code: */
-
+		if(x.eAST.type.Tequal(StdEnvironment.floatType) || x.eAST.type.Tequal(StdEnvironment.intType)) {
+			if(HasIntOrFloatArgs(x.oAST)) {
+				x.type = x.eAST.type;
+				x.oAST.type = x.eAST.type;
+				return;
+			}
+		}
+		else if(x.eAST.type.Tequal(StdEnvironment.boolType)) {
+			if(HasBoolArgs(x.oAST)) {
+				x.type = StdEnvironment.boolType;
+				x.oAST.type = StdEnvironment.intType;
+				return;
+			}
+		}
+		
+		x.type = StdEnvironment.errorType;
+		x.oAST.type = StdEnvironment.errorType;
+		reporter.reportError(errMsg[10], "", x.pos);
         /* End of your code */
     }
 
@@ -862,25 +879,25 @@ public class SemanticAnalysis implements Visitor {
     }
 
     public void visit(ActualParam x) {
-	x.pAST.accept(this);
-	x.type = x.pAST.type;
+		x.pAST.accept(this);
+		x.type = x.pAST.type;
     }
 
     public void visit(EmptyActualParam x) {
     }
 
     public void visit(ActualParamSequence x) {
-	x.lAST.accept(this);
-	x.rAST.accept(this);
+		x.lAST.accept(this);
+		x.rAST.accept(this);
     }
 
     public void visit(CallExpr x) {
         //Here we perform semantic analysis of function calls:
-	x.type = StdEnvironment.errorType;
-	x.idAST.accept(this);
-	x.paramAST.accept(this);
+		x.type = StdEnvironment.errorType;
+		x.idAST.accept(this);
+		x.paramAST.accept(this);
         //Retrieve the declaration of x from the scope stack:
-	Decl D = scopeStack.retrieve(x.idAST.Lexeme);
+		Decl D = scopeStack.retrieve(x.idAST.Lexeme);
         // STEP 3:
         // Use "instanceof" to find out if D is a FunDecl. If not, report
         // Error 19 and *return*.
@@ -891,7 +908,7 @@ public class SemanticAnalysis implements Visitor {
         /* Start of your code: */
 
         /* End of your code */
-	FunDecl F = (FunDecl ) D;
+		FunDecl F = (FunDecl ) D;
         // STEP 2:
         // Check that the number of formal args from F and the number of actual
         // parameters of the function call x match.
@@ -939,14 +956,14 @@ public class SemanticAnalysis implements Visitor {
         //}
         /* End of your code */
 
-	// set the return type of the call expression to the return type of
-	// its function:
-	x.type = typeOfDecl(F);
+		// set the return type of the call expression to the return type of
+		// its function:
+		x.type = typeOfDecl(F);
     }
 
     public void visit(ExprSequence x) {
-	x.lAST.accept(this);
-	x.rAST.accept(this);
+		x.lAST.accept(this);
+		x.rAST.accept(this);
     }
 
     public void visit(ID x) {
@@ -959,7 +976,8 @@ public class SemanticAnalysis implements Visitor {
             x.declAST = binding;
         }
         /* Start of your code: */
-
+        else
+        	reporter.reportError(errMsg[5], "", x.pos);
         /* End of your code */
     }
 
